@@ -20,7 +20,7 @@ namespace DevTest.Server.Repositories.Implementation
             }
         }
 
-        protected async Task<IEnumerable<T>> GetAll<TP>()
+        protected async Task<IEnumerable<T>> GetAll()
         {
             using (IDbConnection connection = new SqlConnection(_connectionstring))
             {
@@ -28,22 +28,22 @@ namespace DevTest.Server.Repositories.Implementation
             }
         }
 
-        protected async Task<IEnumerable<T>> ExecuteQuery<TP>(string sql, object? param = null)
+        protected async Task<IEnumerable<TP>> ExecuteQuery<TP>(string sql, object? param = null)
         {
             using (IDbConnection connection = new SqlConnection(_connectionstring))
             {
-                return await connection.QueryAsync<T>(sql, param);
+                return await connection.QueryAsync<TP>(sql, param);
             }
         }
-        protected async Task<T> ExecuteQueryFirstOrDefault<TP>(string sql, object? param = null)
+        protected async Task<TP> ExecuteQueryFirstOrDefault<TP>(string sql, object? param = null)
         {
             using (IDbConnection connection = new SqlConnection(_connectionstring))
             {
-                return await connection.QueryFirstAsync<T>(sql, param);
+                return await connection.QueryFirstAsync<TP>(sql, param);
             }
         }
 
-        protected async Task<int> ExecuteNonQuery<TP>(string sql, object? param = null)
+        protected async Task<int> ExecuteNonQuery(string sql, object? param = null)
         {
             using (IDbConnection connection = new SqlConnection(_connectionstring))
             {

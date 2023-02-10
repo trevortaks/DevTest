@@ -4,9 +4,11 @@ namespace DevTest.Server.Repositories.Contracts
 {
     public interface IContactRepository
     {
-        public Contact GetContactById(int contactId);
-        public int SaveContact(Contact contact);
-        public List<Shared.Models.Client> GetClientsByContactId(int contactId);
+        Task<List<Contact>> GetContactsByClientId(int contactId);
+        Task<Contact> GetContactById(int contactId);
+
+        Task<List<Contact>> GetAllContacts();
+        Task<int> SaveContact(Contact contact);
 
     }
 }
