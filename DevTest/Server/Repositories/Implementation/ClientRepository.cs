@@ -1,44 +1,62 @@
-﻿using DevTest.Server.Repositories.Contracts;
+﻿using DevTest.Client.Pages;
+using DevTest.Server.Repositories.Contracts;
+using DevTest.Shared.Dtos;
+using DevTest.Shared.Models;
 
 namespace DevTest.Server.Repositories.Implementation
 {
-    public class ClientRepository : GenericRepository<Shared.Models.Client>, IClientRepository
+    public class ClientRepository : GenericRepository<Shared.Models.ClientDb>, IClientRepository
     {
         public ClientRepository(IConfiguration config) : base(config)
         {
         }
 
-        public async Task<Shared.Models.Client> GetClientByCode(string code)
+        public async Task<ClientDb> GetClientByCode(string code)
         {
             var sql = "SELECT * FROM tblClients WHERE ClientCode = @ClientCode";
-            return await ExecuteQueryFirstOrDefault<Shared.Models.Client>(sql, new { ClientCode = code });
+            return await ExecuteQueryFirstOrDefault<Shared.Models.ClientDb>(sql, new { ClientCode = code });
         }
 
 
-        public Task<Shared.Models.Client> GetClientById(int clientId)
+        public Task<ClientDb> GetClientById(int clientId)
         {
             return GetById(clientId);
         }
 
-        public async Task<Shared.Models.Client> GetClientByName(string name)
+        public async Task<ClientDb> GetClientByName(string name)
         {
             var sql = "SELECT * FROM tblClients WHERE Name = @Name";
-            return await ExecuteQueryFirstOrDefault<Shared.Models.Client>(sql, new { Name = name });
+            return await ExecuteQueryFirstOrDefault<Shared.Models.ClientDb>(sql, new { Name = name });
         }
 
-        public async Task<List<Shared.Models.Client>> GetClientsByContactId(int contactId)
+        public async Task<List<ContactDto>> GetContactsByClientId(int clientId)
         {
-            var sql = "";
-            var clients = await ExecuteQuery<Shared.Models.Client>(sql, new { ContactId = contactId});
-            return clients.ToList();
+            var sql = "SELECT * FROM (SELECT CONCAT(C.Surname, C.Firstname) As FullName C.* FROM tblContacts CO " +
+                            " INNER JOIN tblClientContacts CC ON CC.ContactID = CO.ContactID" +
+                            " INNER JOIN tblClients C ON C.ClientID = CC.ClientID" +
+                            " WHERE C.ClientID = @ClientId)" +
+                            " ORDER BY FullName";
+            var contacts = await ExecuteQuery<ContactDto>(sql, new { ClientId = clientId });
+            return contacts.ToList();
         }
 
-        public async Task<int> SaveClient(Shared.Models.Client client)
+        public async Task<List<ClientDb>> GetAllClientsWithContactCount()
+        {
+            var sql = "SELECT C.ClientID, C.ClientCode, C.Name, COUNT(CO.ContactID) from tblClients C" +
+                            " INNER JOIN tblClientContacts CC ON CC.ClientID = C.ClientID" +
+                            " INNER JOIN tblContacts CO ON CC.ContactID = CO.ContactID" +
+                            " GROUP BY C.ClientID, C.Name, C.Code" +
+                            " ORDER BY C.Name";
+            var contacts = await ExecuteQuery<ClientDb>(sql);
+            return contacts.ToList();
+        }
+
+        public async Task<int> SaveClient(ClientDb client)
         {
             return await Create(client);
         }
 
-        public async Task<int> SaveClients(List<Shared.Models.Client> clients)
+        public async Task<int> SaveClients(List<ClientDb> clients)
         {
             return await CreateRange(clients);
         }
@@ -79,20 +97,22 @@ namespace DevTest.Server.Repositories.Implementation
             return prefix;
         }
 
-        public async Task<bool> UpdateClient(Shared.Models.Client client)
+        public async Task<bool> UpdateClient(ClientDb client)
         {
             return await Update(client);
         }
 
-        public async Task<bool> updateClients(List<Shared.Models.Client> clients)
+        public async Task<bool> updateClients(List<ClientDb> clients)
         {
             return await UpdateRange(clients);
         }
 
-        public async Task<List<Shared.Models.Client>> GetAllClients()
+        public async Task<List<ClientDb>> GetAllClients()
         {
-            List<Shared.Models.Client> clients = (List<Shared.Models.Client>)await GetAll();
+            List<ClientDb> clients = (List<ClientDb>)await GetAll();
             return clients;
         }
+
+       
     }
 }

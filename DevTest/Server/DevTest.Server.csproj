@@ -19,5 +19,9 @@
     <ProjectReference Include="..\Shared\DevTest.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
 
 </Project>

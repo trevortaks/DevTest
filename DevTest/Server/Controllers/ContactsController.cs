@@ -24,25 +24,40 @@ namespace DevTest.Server.Controllers
             return Ok(contact);
         }
 
-        [HttpGet]
+        [HttpGet("GetAllContacts")]
         public async Task<IActionResult> GetAllContacts()
         {
             var contacts = await _contactsRepository.GetAllContacts();
             return Ok(contacts);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SaveContact(Contact contact)
+        [HttpGet("GetAllContactsWithClientCount")]
+        public async Task<IActionResult> GetAllContactsWithClientCount()
+        {
+            var contacts = await _contactsRepository.GetAllContactsWithClientCount();
+            return Ok(contacts);
+        }
+
+        [HttpGet("GetContactClients/{contactId}")]
+        public async Task<IActionResult> GetContactClients(int contactId)
+        {
+            var clients = await _contactsRepository.GetClientsByContactId(contactId);
+            if (clients == null) return NotFound();
+            return Ok(clients);
+        }
+
+        [HttpPost("SaveContact")]
+        public async Task<IActionResult> SaveContact([FromBody]Contact contact)
         {
             var result = await _contactsRepository.SaveContact(contact);
 
             if (result < 1) return StatusCode(500);
 
-            return Ok();
+            return Ok(result < 1);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateContact(Contact contact)
+        [HttpPut("UpdateContact")]
+        public async Task<IActionResult> UpdateContact([FromBody]Contact contact)
         {
             //var result = await _contactsRepository.Up
             return Ok();

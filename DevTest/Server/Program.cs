@@ -1,3 +1,5 @@
+using DevTest.Server.Repositories.Contracts;
+using DevTest.Server.Repositories.Implementation;
 using Microsoft.AspNetCore.ResponseCompression;
 
 namespace DevTest
@@ -9,6 +11,9 @@ namespace DevTest
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+
+            builder.Services.AddScoped<IClientRepository, ClientRepository>()
+                            .AddScoped<IContactRepository, ContactRepository>();
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();

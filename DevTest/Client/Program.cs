@@ -1,4 +1,6 @@
+using Blazored.Modal;
 using DevTest.Client;
+using DevTest.Client.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -12,7 +14,11 @@ namespace DevTest.Client
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
+                        .AddScoped<ClientService>()
+                        .AddScoped<ContactService>()
+                        .AddScoped<RequestClient>()
+                        .AddBlazoredModal();
 
             await builder.Build().RunAsync();
         }

@@ -1,0 +1,30 @@
+﻿<div>
+    <EditForm Model="@client" OnValidSubmit="@Submit">
+        <div class="row">
+            <div classs="col-6 form-group">
+                <label>Client No</label>
+                <InputText class="form-control" readonly @bind-Value="client.ClientNo"/>
+            </div>
+        </div>
+        <div class="row">
+            <div classs="col-6 form-group">
+                <label>Client Name</label>
+                <InputText class="form-control" @bind-Value="client.Name" />
+            </div>
+        </div>
+        <div class="mt-4 mb-3">
+            <button type="submit" class="btn btn-primary" >Create Client</button>
+        </div>
+    </EditForm>
+</div>
+
+
+@code {
+    ClientDb client = new ClientDb();
+
+    private void Submit()
+    {
+
+    }
+
+}

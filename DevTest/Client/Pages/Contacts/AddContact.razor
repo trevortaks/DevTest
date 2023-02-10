@@ -1,0 +1,34 @@
+﻿<div>
+    <EditForm Model="@contact" OnValidSubmit="@Submit">
+        <div class="row">
+            <div classs="col-6 form-group">
+                <label>Name</label>
+                <InputText class="form-control" readonly @bind-Value="@contact.Name" />
+            </div>
+            <div classs="col-6 form-group">
+                <label>Surname</label>
+                <InputText class="form-control" readonly @bind-Value="@contact.Surname" />
+            </div>
+        </div>
+        <div class="row">
+            <div classs="col-6 form-group">
+                <label>Email Address</label>
+                <InputText class="form-control" @bind-Value="@contact.EmailAddress" />
+            </div>
+        </div>
+        <div class="mt-4 mb-3">
+            <button type="submit" class="btn btn-primary">Create Contact</button>
+        </div>
+    </EditForm>
+</div>
+
+
+@code {
+    Contact contact = new Contact();
+
+    private void Submit()
+    {
+
+    }
+
+}

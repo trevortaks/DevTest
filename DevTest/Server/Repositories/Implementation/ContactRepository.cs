@@ -1,4 +1,5 @@
 ﻿using DevTest.Server.Repositories.Contracts;
+using DevTest.Shared.Dtos;
 using DevTest.Shared.Models;
 
 namespace DevTest.Server.Repositories.Implementation
@@ -9,14 +10,14 @@ namespace DevTest.Server.Repositories.Implementation
         {
         }
 
-        public async Task<List<Contact>> GetContactsByClientId(int contactId)
+        public async Task<List<ClientDto>> GetClientsByContactId(int contactId)
         {
-            var sql = "SELECT C.* FROM tblContacts CO " +
-                            "INNER JOIN tblClientContacts CC ON CC.ContactID = CO.ContactID" +
-                            "INNER JOIN tblClients C ON C.ClientID = CC.ClientID" +
-                            "WHERE CO.ContactID = @ContactID";
-            var contacts = await ExecuteQuery<Contact>(sql, new { ContactID = contactId });
-            return contacts.ToList();
+            var sql = "SELECT C.* from tblClients C" +
+                            " INNER JOIN tblClientContacts CC ON CC.ClientID = C.ClientID" +
+                            " INNER JOIN tblContacts CO ON CC.ContactID = CO.ContactID" +
+                            " WHERE CO.ContactID = @ContactId ORDER BY C.Name";
+            var clients = await ExecuteQuery<ClientDto>(sql, new { ContactId = contactId });
+            return clients.ToList();
         }
 
         public async Task<Contact> GetContactById(int contactId)
@@ -32,6 +33,16 @@ namespace DevTest.Server.Repositories.Implementation
         public async Task<List<Contact>> GetAllContacts()
         {
             return (List<Contact>)await GetAll();
+        }
+
+        Task<List<ClientDto>> IContactRepository.GetClientsByContactId(int contactId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<ContactDto>> GetAllContactsWithClientCount()
+        {
+            throw new NotImplementedException();
         }
     }
 }
