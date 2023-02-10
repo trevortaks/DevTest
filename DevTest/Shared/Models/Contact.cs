@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Dapper.Contrib.Extensions;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using KeyAttribute = Dapper.Contrib.Extensions.KeyAttribute;
 
 namespace DevTest.Shared.Models
 {
     [Table("tblContacts")]
     public class Contact
     {
-        [Key]
+        [KeyAttribute]
         public int ContactId { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
         public string Surname { get; set; }
+        [EmailAddress,Required]
         public string EmailAddress { get; set; }
     }
 }
