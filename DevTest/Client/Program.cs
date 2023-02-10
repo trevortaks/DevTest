@@ -1,4 +1,5 @@
 using Blazored.Modal;
+using Blazored.Toast;
 using BlazorSpinner;
 using DevTest.Client;
 using DevTest.Client.Services;
@@ -20,7 +21,8 @@ namespace DevTest.Client
                         .AddScoped<ContactService>()
                         .AddScoped<RequestClient>()
                         .AddScoped<SpinnerService>()
-                        .AddBlazoredModal();
+                        .AddBlazoredModal()
+                        .AddBlazoredToast();
 
             await builder.Build().RunAsync();
         }
