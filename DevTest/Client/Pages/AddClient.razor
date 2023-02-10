@@ -1,5 +1,10 @@
-﻿<div>
-    <EditForm Model="@client" OnValidSubmit="@Submit">
+﻿@inject SpinnerService spinner
+@inject IToastService toaster
+@inject ClientService clientService
+<div>
+    <EditForm Model="client" OnValidSubmit="@Submit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
         <div class="row">
             <div classs="col-6 form-group">
                 <label>Client No</label>
@@ -22,9 +27,29 @@
 @code {
     ClientDb client = new ClientDb();
 
-    private void Submit()
+    protected override Task OnInitializedAsync()
     {
+        return base.OnInitializedAsync();
+    }
 
+    private async void Submit()
+    {
+        try
+        {
+            spinner.Show();
+            int clientId = await clientService.SaveClient(client);
+            client = await clientService.GetClientById(clientId);
+            StateHasChanged();
+            spinner.Hide();
+
+            toaster.ShowSuccess("Client save successfully");
+        }
+        catch (Exception)
+        {
+            toaster.ShowError("Error occured on trying to save. Please try again");
+            spinner.Hide();
+        }
+        
     }
 
 }

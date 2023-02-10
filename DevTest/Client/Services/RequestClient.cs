@@ -18,10 +18,15 @@ namespace DevTest.Client.Services
             return response;
         }
 
-        public async Task<bool> PostJsonAsync<T>(string url, T model)
+        public async Task<int> PostJsonAsync<T>(string url, T model)
         {
             var response = await _httpClient.PostAsJsonAsync(url, model);
-            return response.IsSuccessStatusCode;
+            if (response.IsSuccessStatusCode)
+            {
+                return int.Parse(await response.Content.ReadAsStringAsync());
+            }
+
+            return 0;
         }
 
         public async Task<bool> PutJsonAsync<T>(string url, T model)

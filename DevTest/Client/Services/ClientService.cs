@@ -21,7 +21,7 @@ namespace DevTest.Client.Services
             return await _client.GetJsonAsync<List<ClientDb>>(ApiRoutes.GetAllClients);
         }
 
-        public async Task<bool> SaveClient(ClientDb client)
+        public async Task<int> SaveClient(ClientDb client)
         {
             return await _client.PostJsonAsync(ApiRoutes.SaveClient, client);
         }

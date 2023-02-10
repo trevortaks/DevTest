@@ -1,6 +1,7 @@
 ﻿@page "/Clients"
 @inject ClientService clientService
 @inject SpinnerService spinner
+@inject IToastService toastr
 
 <h2>List of Clients</h2>
 
@@ -44,9 +45,17 @@ else{
 
     protected override async Task OnInitializedAsync()
     {
-        spinner.Show();
-        clients = await clientService.GetAllClients();
-        spinner.Hide();
+        try
+        {
+            spinner.Show();
+            clients = await clientService.GetAllClients();
+            spinner.Hide();
+        }
+        catch (Exception)
+        {
+            toastr.ShowError("An error occured on load.Please reload the page");
+        }
+        
         await base.OnInitializedAsync();
     }
 

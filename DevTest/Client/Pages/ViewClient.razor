@@ -1,6 +1,7 @@
 ﻿@page "/ViewClient/{clientId}"
 @inject ClientService clientService
 @inject SpinnerService spinner
+@inject IToastService toaster
 
 <ul class="nav nav-tabs">
     <li class="nav-item">
@@ -66,10 +67,20 @@
     public List<Contact> contacts = new List<Contact>();
 
     protected override async Task OnInitializedAsync()
-    {
-        spinner.Show();
-        client = await clientService.GetClientById(clientId);
-        spinner.Hide();
+    {   try
+        {
+            spinner.Show();
+            client = await clientService.GetClientById(clientId);
+            spinner.Hide();
+        }
+        catch (Exception)
+        {
+            toaster.ShowError("An error occured on load.Please reload the page");
+        }
+        finally{
+            spinner.Hide();
+        }
+       
         await base.OnInitializedAsync();
     }
 }

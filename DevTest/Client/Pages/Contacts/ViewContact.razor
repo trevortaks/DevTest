@@ -1,6 +1,7 @@
 ﻿@page "/ViewContact/{contactId}"
 @inject ContactService contactService
 @inject SpinnerService spinner
+@inject IToastService toastr
 
 <ul class="nav nav-tabs">
     <li class="nav-item">
@@ -76,7 +77,14 @@
     protected override async Task OnInitializedAsync()
     {
         spinner.Show();
-        Contact contact = await contactService.GetContactById(contactId);
+        try
+        {
+            Contact contact = await contactService.GetContactById(contactId);
+        }
+        catch (Exception)
+        {
+            toastr.ShowError("Error occured on load. Please reload the page");
+        }
         spinner.Hide();
         await base.OnInitializedAsync();
     }
