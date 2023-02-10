@@ -53,6 +53,10 @@ namespace DevTest.Server.Repositories.Implementation
 
         public async Task<int> SaveClient(ClientDb client)
         {
+            string prefix = GenerateClientPrefix(client.Name);
+            int code = await GetNextNumberInSeuence(prefix);
+            client.ClientNo = prefix + code.ToString("000");
+
             return await Create(client);
         }
 

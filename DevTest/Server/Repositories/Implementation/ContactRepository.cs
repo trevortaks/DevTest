@@ -27,7 +27,20 @@ namespace DevTest.Server.Repositories.Implementation
 
         public async Task<int> SaveContact(Contact contact)
         {
+            if (await CheckEmailIsUnique(contact.EmailAddress))
+            {
+                throw new Exception("Email already exists");
+            }
+
             return await Create(contact);
+        }
+
+        public async Task<bool> CheckEmailIsUnique(string email)
+        {
+            var sql = "SELECT EmailAddress from tblContacts where EmailAddress = @EmailAddress";
+            string result = await ExecuteQueryFirstOrDefault<string>(sql, new {EmailAddress = email});
+
+            return String.IsNullOrEmpty(result);
         }
 
         public async Task<List<Contact>> GetAllContacts()

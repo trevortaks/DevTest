@@ -51,9 +51,7 @@ namespace DevTest.Server.Controllers
         {
             var result = await _contactsRepository.SaveContact(contact);
 
-            if (result < 1) return StatusCode(500);
-
-            return Ok(result < 1);
+            return Ok(result);
         }
 
         [HttpPut("UpdateContact")]
