@@ -1,4 +1,5 @@
 using Blazored.Modal;
+using BlazorSpinner;
 using DevTest.Client;
 using DevTest.Client.Services;
 using Microsoft.AspNetCore.Components.Web;
@@ -18,6 +19,7 @@ namespace DevTest.Client
                         .AddScoped<ClientService>()
                         .AddScoped<ContactService>()
                         .AddScoped<RequestClient>()
+                        .AddScoped<SpinnerService>()
                         .AddBlazoredModal();
 
             await builder.Build().RunAsync();

@@ -1,5 +1,6 @@
 ﻿@page "/ViewContact/{contactId}"
 @inject ContactService contactService
+@inject SpinnerService spinner
 
 <ul class="nav nav-tabs">
     <li class="nav-item">
@@ -74,7 +75,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        spinner.Show();
         Contact contact = await contactService.GetContactById(contactId);
+        spinner.Hide();
         await base.OnInitializedAsync();
     }
 }

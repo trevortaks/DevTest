@@ -1,5 +1,6 @@
 ﻿@page "/ViewClient/{clientId}"
 @inject ClientService clientService
+@inject SpinnerService spinner
 
 <ul class="nav nav-tabs">
     <li class="nav-item">
@@ -66,7 +67,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        spinner.Show();
         client = await clientService.GetClientById(clientId);
-        base.OnInitializedAsync();
+        spinner.Hide();
+        await base.OnInitializedAsync();
     }
 }

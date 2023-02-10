@@ -1,5 +1,6 @@
 ﻿@page "/Clients"
 @inject ClientService clientService
+@inject SpinnerService spinner
 
 <h2>List of Clients</h2>
 
@@ -43,7 +44,9 @@ else{
 
     protected override async Task OnInitializedAsync()
     {
+        spinner.Show();
         clients = await clientService.GetAllClients();
+        spinner.Hide();
         await base.OnInitializedAsync();
     }
 
