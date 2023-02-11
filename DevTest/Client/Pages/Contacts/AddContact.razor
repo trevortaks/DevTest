@@ -20,38 +20,58 @@
             </div>
         </div>
         <div class="mt-4 mb-3">
-            <button type="submit" class="btn btn-primary">Create Contact</button>
+            <button type="submit" class="btn btn-primary">@(contact.ContactId > 0 ? "Update Contact" : "Create Contact";)</button>
         </div>
     </EditForm>
 </div>
 
 
 @code {
+
     Contact contact = new Contact();
+
 
     private async void Submit()
     {
-        //try
-        //{
+        try
+        {
             spinner.Show();
-            var response = await contactService.SaveContact(contact);
-            if (!response?.Success ?? true)
+            if(contact.ContactId <= 0)
             {
+                ResponseModel<Contact>? _contact = await contactService.SaveContact(contact);
+                if (!_contact?.Success ?? true)
+                {
+                    spinner.Hide();
+                    toastr.ShowError(_contact?.Message ?? "Something went wrong");
+                    return;
+                }
+
+                contact = _contact?.Content ?? new Contact();
                 spinner.Hide();
-                toastr.ShowError(response?.Message ?? "Something went wrong");
-                return;
+
+                toastr.ShowSuccess("Contact saved sucessfully");
             }
+            else
+            {
+                var _result = await contactService.UpdateContact(contact);
+                if (!_result?.Success ?? true)
+                {
+                    spinner.Hide();
+                    toastr.ShowError(_result?.Message ?? "Something went wrong");
+                    return;
+                }
 
-            contact = response?.Content ?? new Contact();
+                spinner.Hide();
+
+                toastr.ShowSuccess("Contact updated sucessfully");
+            }
+            
+        }
+        catch (Exception)
+        {
             spinner.Hide();
-
-            toastr.ShowSuccess("Contact saved sucessfully");
-        //}
-        //catch (Exception)
-        //{
-        //    spinner.Hide();
-        //    toastr.ShowError("Error occured on saving.Please try again"); 
-        //}
+            toastr.ShowError("Error occured on saving.Please try again"); 
+        }
     }
 
 }
