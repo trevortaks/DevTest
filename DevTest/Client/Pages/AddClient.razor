@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="mt-4 mb-3">
-            <button type="submit" class="btn btn-primary" >Create Client</button>
+            <button type="submit" class="btn btn-primary" disabled ="@(client.ClientID > 0) ">Save Client</button>
         </div>
     </EditForm>
 </div>
@@ -44,6 +44,8 @@
                 toaster.ShowError(response?.Message ?? "Something went wrong");
                 return;
             }
+
+
 
             client = response?.Content ?? new ClientDb();
             StateHasChanged();
