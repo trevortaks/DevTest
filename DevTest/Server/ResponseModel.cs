@@ -9,7 +9,7 @@
 
     public class ResponseModel<T> : ResponseModel
     {
-        public ResponseModel(T content, bool success, string message)
+        public ResponseModel(T content, bool success = true, string message = "")
         {
             Content = content;
             Message = message;

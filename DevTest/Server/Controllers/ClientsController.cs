@@ -1,4 +1,5 @@
 ﻿using DevTest.Server.Repositories.Contracts;
+using DevTest.Shared.Dtos;
 using DevTest.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +23,7 @@ namespace DevTest.Server.Controllers
         {
             var clients = await _clients.GetAllClients();
 
-            return Ok(clients);
+            return Ok(new ResponseModel<List<ClientDb>>(clients));
         }
 
         [HttpGet("GetAllClientsWithContactCount")]
@@ -30,7 +31,7 @@ namespace DevTest.Server.Controllers
         {
             var clients = await _clients.GetAllClientsWithContactCount();
 
-            return Ok(clients);
+            return Ok(new ResponseModel<List<ClientDto>>(clients));
         }
 
         [HttpGet("GetClient/{id}")]
@@ -40,7 +41,7 @@ namespace DevTest.Server.Controllers
 
             if (client == null) return NotFound();
 
-            return Ok(client);
+            return Ok(new ResponseModel<ClientDb>(client));
         }
 
         [HttpGet("/GetClientContacts/{id}")]
@@ -50,20 +51,23 @@ namespace DevTest.Server.Controllers
 
             if (contacts == null) return NotFound();
 
-            return Ok(contacts);
+            return Ok(new ResponseModel<List<ContactDto>>(contacts));
         }
 
         [HttpPost("SaveClient")]
-        public async void SaveClient([FromBody] ClientDb client)
+        public async Task<IActionResult> SaveClient([FromBody] ClientDb client)
         {
-            await _clients.SaveClient(client);
+            var id = await _clients.SaveClient(client);
+            var newClient = await _clients.GetClientById(id);
+            return Ok(new ResponseModel<ClientDb>(newClient));
         }
 
 
         [HttpPut("UpdateClient")]
-        public async void UpdateClient([FromBody] ClientDb client)
+        public async Task<IActionResult> UpdateClient([FromBody] ClientDb client)
         {
             var result = await _clients.UpdateClient(client);
+            return Ok(new ResponseModel<bool>(result));
         }
     }
 }

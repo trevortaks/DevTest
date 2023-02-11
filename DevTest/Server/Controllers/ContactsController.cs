@@ -1,4 +1,6 @@
-﻿using DevTest.Server.Repositories.Contracts;
+﻿using DevTest.Client.Pages.Contacts;
+using DevTest.Server.Repositories.Contracts;
+using DevTest.Shared.Dtos;
 using DevTest.Shared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,14 +30,14 @@ namespace DevTest.Server.Controllers
         public async Task<IActionResult> GetAllContacts()
         {
             var contacts = await _contactsRepository.GetAllContacts();
-            return Ok(contacts);
+            return Ok(new ResponseModel<List<Contact>>(contacts));
         }
 
         [HttpGet("GetAllContactsWithClientCount")]
         public async Task<IActionResult> GetAllContactsWithClientCount()
         {
             var contacts = await _contactsRepository.GetAllContactsWithClientCount();
-            return Ok(contacts);
+            return Ok(new ResponseModel<List<ContactDto>>(contacts));
         }
 
         [HttpGet("GetContactClients/{contactId}")]
@@ -43,15 +45,16 @@ namespace DevTest.Server.Controllers
         {
             var clients = await _contactsRepository.GetClientsByContactId(contactId);
             if (clients == null) return NotFound();
-            return Ok(clients);
+            return Ok(new ResponseModel<List<ClientDto>>(clients));
         }
 
         [HttpPost("SaveContact")]
         public async Task<IActionResult> SaveContact([FromBody]Contact contact)
         {
             var result = await _contactsRepository.SaveContact(contact);
+            var newContact = await _contactsRepository.GetContactById(result);
 
-            return Ok(result);
+            return Ok(new ResponseModel<Contact>(newContact));
         }
 
         [HttpPut("UpdateContact")]
