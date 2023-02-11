@@ -48,7 +48,16 @@ else{
         try
         {
             spinner.Show();
-            clients = await clientService.GetAllClientsWithContactCount();
+            var response = await clientService.GetAllClientsWithContactCount();
+
+            if(!response?.Success ?? true)
+            {
+                toastr.ShowError(response?.Message ?? "An error occured");
+                spinner.Hide();
+                return;
+            }
+
+            clients = response?.Content ?? new List<ClientDto>();
             spinner.Hide();
         }
         catch (Exception)

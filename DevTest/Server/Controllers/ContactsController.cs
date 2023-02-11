@@ -1,5 +1,6 @@
 ﻿using DevTest.Client.Pages.Contacts;
 using DevTest.Server.Repositories.Contracts;
+using DevTest.Shared;
 using DevTest.Shared.Dtos;
 using DevTest.Shared.Models;
 using Microsoft.AspNetCore.Http;

@@ -51,7 +51,16 @@ else
         try
         {
             spinner.Show();
-            _contacts = await contactService.GetAllContactsWithClientCount();
+            var response = await contactService.GetAllContactsWithClientCount();
+
+            if(!response?.Success ?? true)
+            {
+                spinner.Hide();
+                toastr.ShowError(response?.Message ?? "Something went wrong");
+                return;
+            }
+
+            _contacts = response?.Content ?? new List<ContactDto>();
             spinner.Hide();
         }
         catch (Exception)

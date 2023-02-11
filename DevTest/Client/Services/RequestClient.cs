@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Json;
+﻿using DevTest.Shared;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace DevTest.Client.Services
 {
@@ -12,27 +14,23 @@ namespace DevTest.Client.Services
         }
 
 
-        public async Task<T> GetJsonAsync<T>(string url)
+        public async Task<ResponseModel<T>?> GetJsonAsync<T>(string url)
         {
-            var response = await _httpClient.GetFromJsonAsync<T>(url);
+            var response = await _httpClient.GetFromJsonAsync<ResponseModel<T>>(url);
             return response;
         }
 
-        public async Task<int> PostJsonAsync<T>(string url, T model)
+        public async Task<ResponseModel<T>?> PostJsonAsync<T>(string url, T model)
         {
             var response = await _httpClient.PostAsJsonAsync(url, model);
-            if (response.IsSuccessStatusCode)
-            {
-                return int.Parse(await response.Content.ReadAsStringAsync());
-            }
+            return JsonSerializer.Deserialize(await response.Content.ReadAsStringAsync(), typeof(ResponseModel<T>)) as ResponseModel<T>;
 
-            return 0;
         }
 
-        public async Task<bool> PutJsonAsync<T>(string url, T model)
+        public async Task<ResponseModel<bool>?> PutJsonAsync<T>(string url, T model)
         {
             var response = await _httpClient.PutAsJsonAsync(url, model);
-            return true;
+            return (ResponseModel<bool>?)JsonSerializer.Deserialize(await response.Content.ReadAsStringAsync(), typeof(ResponseModel<bool>));
         }
     }
 }

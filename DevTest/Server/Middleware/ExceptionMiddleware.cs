@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using DevTest.Shared;
+using System.Net;
 using System.Text.Json;
 
 namespace DevTest.Server.Middleware

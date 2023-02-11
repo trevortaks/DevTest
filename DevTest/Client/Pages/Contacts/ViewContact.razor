@@ -71,7 +71,7 @@
     [Parameter]
     public int contactId { get; set; }
 
-    public ContactDto Contact;
+    public Contact Contact;
     public List<ClientDb> clients = new List<ClientDb>();
 
     protected override async Task OnInitializedAsync()
@@ -79,7 +79,15 @@
         spinner.Show();
         try
         {
-            Contact contact = await contactService.GetContactById(contactId);
+            var response = await contactService.GetContactById(contactId);
+            if (!response?.Success ?? true)
+            {
+                spinner.Hide();
+                toastr.ShowError(response?.Message ?? "Something went wrong");
+                return;
+            }
+
+            Contact = response?.Content ?? new Contact();
         }
         catch (Exception)
         {

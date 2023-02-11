@@ -37,12 +37,17 @@
         try
         {
             spinner.Show();
-            int clientId = await clientService.SaveClient(client);
-            client = await clientService.GetClientById(clientId);
-            StateHasChanged();
-            spinner.Hide();
+            var response = await clientService.SaveClient(client);
+            if(!response?.Success ?? false)
+            {
+                spinner.Hide();
+                toaster.ShowError(response?.Message ?? "Something went wrong");
+                return;
+            }
 
-            toaster.ShowSuccess("Client save successfully");
+            client = response?.Content ?? new ClientDb();
+            StateHasChanged();
+            toaster.ShowSuccess("Client saved successfully");
         }
         catch (Exception)
         {

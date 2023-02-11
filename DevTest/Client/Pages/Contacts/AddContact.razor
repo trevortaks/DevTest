@@ -34,8 +34,15 @@
         //try
         //{
             spinner.Show();
-            int contactId = await contactService.SaveContact(contact);
-            contact = await contactService.GetContactById(contactId);
+            var response = await contactService.SaveContact(contact);
+            if (!response?.Success ?? true)
+            {
+                spinner.Hide();
+                toastr.ShowError(response?.Message ?? "Something went wrong");
+                return;
+            }
+
+            contact = response?.Content ?? new Contact();
             spinner.Hide();
 
             toastr.ShowSuccess("Contact saved sucessfully");

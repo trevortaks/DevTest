@@ -1,4 +1,4 @@
-﻿namespace DevTest.Server
+﻿namespace DevTest.Shared
 {
     public class ResponseModel
     {

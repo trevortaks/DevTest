@@ -70,7 +70,16 @@
     {   try
         {
             spinner.Show();
-            client = await clientService.GetClientById(clientId);
+            var response = await clientService.GetClientById(clientId);
+
+            if (!response?.Success ?? false)
+            {
+                spinner.Hide();
+                toaster.ShowError(response?.Message ?? "Something went wrong");
+                return;
+            }
+
+            client = response?.Content ?? new ClientDb();
             spinner.Hide();
         }
         catch (Exception)
