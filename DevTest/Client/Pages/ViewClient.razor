@@ -49,7 +49,7 @@
                         <tr>
                             <td>@contact.Surname @contact.Name </td>
                             <td>@contact.EmailAddress</td>
-                            <td><a href="" class="btn btn-primary btn-link">Unlink</a></td>
+                            <td><a href='@($"/Unlink/?contactId={contact.ContactId}&clientId={clientId}")' class="btn btn-primary btn-link">Unlink</a></td>
                         </tr>
                     }
                 </tbody>

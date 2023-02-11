@@ -2,7 +2,7 @@
 @inject ContactService contactService
 @inject SpinnerService spinner
 @inject IToastService toastr
-
+@inject NavigationManager navigator
 <div class="mt-4 mb-4">
     <button class="btn btn-outline-primary" @onclick="@ShowModal">Link Clients</button>
 </div>
@@ -57,7 +57,7 @@
                         <tr>
                             <td>@client.Name </td>
                             <td>@client.ClientCode</td>
-                            <td><a href="" class="btn btn-primary btn-link">Unlink</a></td>
+                            <td><a href='@($"/Unlink/?contactId={contactId}&clientId={client.ClientID}")' class="btn btn-primary btn-link">Unlink</a></td>
                         </tr>
                     }
                 </tbody>
@@ -110,6 +110,10 @@
             return true;
         }
         return false;
+    }
+
+    private void Redirect(string url){
+        navigator.NavigateTo(url, false);
     }
 
     private async void ShowModal()

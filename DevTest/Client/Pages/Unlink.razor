@@ -1,5 +1,32 @@
-﻿<h3>Unlink</h3>
+﻿@page "/Unlink/?contactId={contactId:int}&&clientId={clientId:int}"
+@inject ContactService contactService
+@inject SpinnerService spinner
+@inject IToastService toastr
+
+@if(success){
+    <h3>Successfully Unlinked</h3>
+}
+
 
 @code {
+    [Parameter] public int contactId { get; set; }
+    [Parameter] public int clientId { get; set; }
 
+    public bool success = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        spinner.Show();
+        try{
+            var result = await contactService.UnlinkClient(new ContactClient() { ClientId = clientId, ContactId = contactId });
+            success = result?.Success ?? false;
+            spinner.Hide();
+            toastr.ShowSuccess("Successfully Unlinked");
+            StateHasChanged();
+        }catch(Exception e){
+            toastr.ShowError("Unlink failed. Error occured");
+        }
+        
+        await base.OnInitializedAsync();
+    }
 }
