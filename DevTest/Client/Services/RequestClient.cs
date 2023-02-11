@@ -32,5 +32,11 @@ namespace DevTest.Client.Services
             var response = await _httpClient.PutAsJsonAsync(url, model);
             return (ResponseModel<bool>?)JsonSerializer.Deserialize(await response.Content.ReadAsStringAsync(), typeof(ResponseModel<bool>));
         }
+
+        public async Task<ResponseModel<bool>?> DeleteJsonAsync<T>(string url)
+        {
+            var response = await _httpClient.DeleteAsync(url );
+            return (ResponseModel<bool>?)JsonSerializer.Deserialize(await response.Content.ReadAsStringAsync(), typeof(ResponseModel<bool>));
+        }
     }
 }

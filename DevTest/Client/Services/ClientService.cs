@@ -37,5 +37,20 @@ namespace DevTest.Client.Services
         {
             return await _client.GetJsonAsync<List<Contact>>(ApiRoutes.GetClientContacts + clientId.ToString());
         }
+
+        public async Task<ResponseModel<List<ClientDto>>?> GetUnlinkedClientsByContactId(int contactId)
+        {
+            return await _client.GetJsonAsync<List<ClientDto>>(ApiRoutes.GetUnlinkedClientsByContactId + contactId.ToString());
+        }
+
+        public async Task<ResponseModel<ContactClient>?> LinkClient(ContactClient link)
+        {
+            return await _client.PostJsonAsync("", link);
+        }
+
+        public async Task<ResponseModel<bool>?> UnlinkClient(ContactClient link)
+        {
+            return await _client.DeleteJsonAsync<ContactClient>("" + "?contactId = " + link.ContactId + "clientId=" + link.ClientId);
+        }
     }
 }

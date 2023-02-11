@@ -1,0 +1,82 @@
+﻿@inject IToastService toastr
+@inject ClientService clientService
+<h3>Link Clients</h3>
+
+@if (_clients.Count < 1)
+{
+    <h3>No client(s) found</h3>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <td>Name</td>
+                <td>Client code</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in _clients)
+            {
+                <tr>
+                    <td>@client.Name</td>
+                    <td>@client.ClientCode</td>
+                    <td><a class="btn btn-primary btn-link" @onclick="()=>LinkClients(client.ClientID)">Link</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter] public int ContactId { get; set; }
+
+    List<ClientDto> _clients = new List<ClientDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            var response = await clientService.GetUnlinkedClientsByContactId(ContactId);
+
+            if (!response?.Success ?? true)
+            {
+                toastr.ShowError(response?.Message ?? "An error occured");
+                return;
+            }
+
+            _clients = response?.Content ?? new List<ClientDto>();
+        }
+        catch (Exception)
+        {
+            toastr.ShowError("An error occured on load.Please reload the page");
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    public async void LinkClients(int clientId)
+    {
+        try
+        {
+            var response = await clientService.LinkClient(new ContactClient() { ClientId = clientId, ContactId = ContactId });
+            if (!response?.Success ?? true)
+            {
+                toastr.ShowError(response?.Message ?? "An Error occured");
+                return;
+            }
+
+            toastr.ShowSuccess("Contact Linked Successfully");
+            _clients.RemoveAll(c => c.ClientID == clientId);
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+            toastr.ShowError("Error occured. Please try again");
+            throw;
+        }
+    }
+
+}

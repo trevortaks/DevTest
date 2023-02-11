@@ -1,0 +1,83 @@
+﻿@inject IToastService toastr
+@inject ContactService contactService
+
+<h1>Link New Contacts</h1>
+
+@if (_contacts.Count < 1)
+{
+    <h2>No Contacts Found</h2>
+}
+else
+{
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Contact Full Name</th>
+                <th>Contact email address</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contact in _contacts)
+            {
+                <tr>
+                    <td>@contact.Surname @contact.Name </td>
+                    <td>@contact.EmailAddress</td>
+                    <td><a  class="btn btn-primary btn-link" @onclick="()=>LinkContacts(contact.ContactId)">Link</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter] public int ClientId { get; set; }
+
+    List<ContactDto> _contacts = new List<ContactDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await contactService.GetUnlinkedContactsByClientId(ClientId);
+
+            if (!response?.Success ?? true)
+            {
+                toastr.ShowError(response?.Message ?? "Something went wrong");
+                return;
+            }
+
+            _contacts = response?.Content ?? new List<ContactDto>();
+        }
+        catch (Exception)
+        {
+            toastr.ShowError("Error occured on load.Please reload the page");
+        }
+
+
+        await base.OnInitializedAsync();
+    }
+
+    public async void LinkContacts(int contactId)
+    {
+        try
+        {
+            var response = await contactService.LinkClient(new ContactClient() { ClientId = ClientId, ContactId = contactId });
+            if (!response?.Success ?? true)
+            {
+                toastr.ShowError(response?.Message ?? "An Error occured");
+                return;
+            }
+
+            toastr.ShowSuccess("Contact Linked Successfully");
+            _contacts.RemoveAll(c => c.ContactId == contactId);
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+            toastr.ShowError("Error occured. Please try again");
+            throw;
+        }
+    }
+
+}

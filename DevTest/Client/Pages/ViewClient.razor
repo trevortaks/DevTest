@@ -72,11 +72,10 @@
             spinner.Show();
             var response = await clientService.GetClientById(clientId);
 
-            if (!response?.Success ?? false)
+            if (!response?.Success ?? true)
             {
                 spinner.Hide();
                 toaster.ShowError(response?.Message ?? "Something went wrong");
-                return;
             }
 
             client = response?.Content ?? new ClientDb();
@@ -89,7 +88,20 @@
         finally{
             spinner.Hide();
         }
-       
+
         await base.OnInitializedAsync();
+    }
+
+    public async Task<string> GetClientContacts(int clientId)
+    {
+        var _contacts = await clientService.GetClientContacts(clientId);
+
+        if (!_contacts?.Success ?? false)
+        {
+            return _contacts?.Message ?? "Failed to get linked contacts";
+        }
+
+        contacts = _contacts?.Content ?? new List<Contact>();
+        return String.Empty;
     }
 }
