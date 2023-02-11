@@ -1,26 +1,29 @@
 ﻿@inject SpinnerService spinner
 @inject IToastService toastr
 @inject ContactService contactService
+
 <div>
-    <EditForm Model="@contact" OnValidSubmit="@Submit">
+    <EditForm Model="@_contact" OnValidSubmit="@Submit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
         <div class="row">
             <div classs="col-6 form-group">
                 <label>Name</label>
-                <InputText class="form-control" @bind-Value="@contact.Name" />
+                <InputText class="form-control" @bind-Value="_contact.Name" />
             </div>
             <div classs="col-6 form-group">
                 <label>Surname</label>
-                <InputText class="form-control" @bind-Value="@contact.Surname" />
+                <InputText class="form-control" @bind-Value="_contact.Surname" />
             </div>
         </div>
         <div class="row">
             <div classs="col-6 form-group">
                 <label>Email Address</label>
-                <InputText class="form-control" @bind-Value="@contact.EmailAddress" />
+                <InputText class="form-control" @bind-Value="_contact.EmailAddress" />
             </div>
         </div>
         <div class="mt-4 mb-3">
-            <button type="submit" class="btn btn-primary">@(contact.ContactId > 0 ? "Update Contact" : "Create Contact";)</button>
+            <button type="submit" class="btn btn-primary" >Submit</button>
         </div>
     </EditForm>
 </div>
@@ -28,7 +31,7 @@
 
 @code {
 
-    Contact contact = new Contact();
+    Contact _contact = new Contact();
 
 
     private async void Submit()
@@ -36,24 +39,24 @@
         try
         {
             spinner.Show();
-            if(contact.ContactId <= 0)
+            if (_contact.ContactId <= 0)
             {
-                ResponseModel<Contact>? _contact = await contactService.SaveContact(contact);
-                if (!_contact?.Success ?? true)
+                ResponseModel<Contact>? contact = await contactService.SaveContact(_contact);
+                if (!contact?.Success ?? true)
                 {
                     spinner.Hide();
-                    toastr.ShowError(_contact?.Message ?? "Something went wrong");
+                    toastr.ShowError(contact?.Message ?? "Something went wrong");
                     return;
                 }
 
-                contact = _contact?.Content ?? new Contact();
+                _contact = contact?.Content ?? new Contact();
                 spinner.Hide();
 
                 toastr.ShowSuccess("Contact saved sucessfully");
             }
             else
             {
-                var _result = await contactService.UpdateContact(contact);
+                var _result = await contactService.UpdateContact(_contact);
                 if (!_result?.Success ?? true)
                 {
                     spinner.Hide();
@@ -65,13 +68,14 @@
 
                 toastr.ShowSuccess("Contact updated sucessfully");
             }
-            
+
         }
         catch (Exception)
         {
             spinner.Hide();
-            toastr.ShowError("Error occured on saving.Please try again"); 
+            toastr.ShowError("Error occured on saving.Please try again");
         }
     }
 
 }
+

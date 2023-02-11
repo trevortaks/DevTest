@@ -67,7 +67,7 @@ namespace DevTest.Server.Repositories.Implementation
 
         public async Task<int> GetNextNumberInSeuence(string prefix)
         {
-            string sql = $"SELECT ISNULL(MAX(CAST(REPLACE(ClientCode, {prefix}, '') AS INT)) ,0) + 1 from tblClients WHERE ClientCode IS LIKE '{prefix}%'";
+            string sql = $"SELECT ISNULL(MAX(CAST(REPLACE(ClientCode, '{prefix}', '') AS INT)) ,0) + 1 from tblClients WHERE ClientCode LIKE '{prefix}%'";
             return await ExecuteQueryFirstOrDefault<int>(sql);
         }
 
@@ -77,28 +77,28 @@ namespace DevTest.Server.Repositories.Implementation
             string prefix = "";
             if(tokens.Length == 1)
             {
-                prefix = tokens[0].Substring(0,3);
-                if (prefix.Length == 3) return prefix;
+                prefix = tokens[0].Substring(0, tokens[0].Length > 2 ? 3 : tokens[0].Length);
+                if (prefix.Length == 3) return prefix.ToUpper();
             }
             else
             {
                 foreach (var token in tokens)
                 {
                     prefix += token.ElementAt(0);
-                    if (prefix.Length == 3) return prefix;
+                    if (prefix.Length == 3) return prefix.ToUpper();
                 }
             }
 
             string fillers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            int i = 0;
+            int i = 1;
 
             while (prefix.Length < 3)
             {
-                prefix.Append(fillers[i]);
+                prefix += fillers[i];
                 i++;
             }
 
-            return prefix;
+            return prefix.ToUpper();
         }
 
         public async Task<bool> UpdateClient(ClientDb client)
@@ -117,6 +117,11 @@ namespace DevTest.Server.Repositories.Implementation
             return clients;
         }
 
-       
+        public async Task<List<ContactDto>> GetUnlinkedContactsByClientId(int clientId)
+        {
+            var sql = "SELECT * FROM tblContacts " +
+                " WHERE ContactID NOT IN (SELECT ContactID FROM tblClientContacts WHERE Client= @ClientId)";
+            return (List<ContactDto>)await ExecuteQuery<List<ContactDto>>(sql, new { ClientId = clientId });
+        }
     }
 }

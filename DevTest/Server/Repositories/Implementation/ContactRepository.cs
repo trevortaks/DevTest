@@ -25,6 +25,7 @@ namespace DevTest.Server.Repositories.Implementation
             return await GetById(contactId);
         }
 
+
         public async Task<int> SaveContact(Contact contact)
         {
             if (await CheckEmailIsUnique(contact.EmailAddress))
@@ -50,13 +51,20 @@ namespace DevTest.Server.Repositories.Implementation
 
         public async Task<List<ContactDto>> GetAllContactsWithClientCount()
         {
-            var sql = "SELECT * FROM (SELECT CO.Name, CO.Surname, CONCAT(CO.Surname, ' ', CO.Name) As FullName, CO.EmailAddress, Count(C.ClientCode) As LinkedClients from tblContacts CO " +
+            var sql = "SELECT * FROM (SELECT CO.ContactID, CO.Name, CO.Surname, CONCAT(CO.Surname, ' ', CO.Name) As FullName, CO.EmailAddress, Count(C.ClientCode) As LinkedClients from tblContacts CO " +
                 " LEFT OUTER JOIN tblClientContacts CC ON CO.ContactID = CC.ContactID " +
                 " LEFT OUTER JOIN tblClients C ON CC.ClientID = C.ClientID" +
-                " GROUP BY CO.Surname, CO.Name, Co.EmailAddress) Contacts" +
+                " GROUP BY Co.ContactID, CO.Surname, CO.Name, Co.EmailAddress) Contacts" +
                 " ORDER BY Fullname";
 
             return (List<ContactDto>)await ExecuteQuery<ContactDto>(sql);
+        }
+
+        public async Task<List<ClientDto>> GetUnlinkedClientsByContactId(int contactId)
+        {
+            var sql = "SELECT * FROM tblClients" +
+                        " WHERE ClientID NOT IN (SELECT ClientID FROM tblClientContacts WHERE ContactID = @ContactID)";
+            return (List<ClientDto>)await ExecuteQuery<List<ContactDto>>(sql, new { ContactID = contactId });
         }
     }
 }

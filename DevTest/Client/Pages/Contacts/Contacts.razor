@@ -51,16 +51,7 @@ else
         try
         {
             spinner.Show();
-            var response = await contactService.GetAllContactsWithClientCount();
-
-            if(!response?.Success ?? true)
-            {
-                spinner.Hide();
-                toastr.ShowError(response?.Message ?? "Something went wrong");
-                return;
-            }
-
-            _contacts = response?.Content ?? new List<ContactDto>();
+            await LoadContacts();
             spinner.Hide();
         }
         catch (Exception)
@@ -70,14 +61,28 @@ else
         finally{
             spinner.Hide();
         }
-        
+
         await base.OnInitializedAsync();
+    }
+
+    public async Task LoadContacts(){
+        var response = await contactService.GetAllContactsWithClientCount();
+
+        if (!response?.Success ?? true)
+        {
+            spinner.Hide();
+            toastr.ShowError(response?.Message ?? "Something went wrong");
+            return;
+        }
+
+        _contacts = response?.Content ?? new List<ContactDto>();
     }
 
     public async Task AddNewContact()
     {
         var modal = modalService.Show<AddContact>("Create new client");
         await modal.Result;
+        await LoadContacts();
     }
 
 }

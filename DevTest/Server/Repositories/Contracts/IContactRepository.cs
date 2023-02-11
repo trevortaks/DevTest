@@ -9,6 +9,7 @@ namespace DevTest.Server.Repositories.Contracts
         Task<Contact> GetContactById(int contactId);
         Task<List<Contact>> GetAllContacts();
         Task<List<ContactDto>> GetAllContactsWithClientCount();
+        Task<List<ClientDto>> GetUnlinkedClientsByContactId(int contactId);
         Task<int> SaveContact(Contact contact);
 
     }

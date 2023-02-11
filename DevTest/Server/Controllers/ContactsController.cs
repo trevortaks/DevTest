@@ -19,12 +19,12 @@ namespace DevTest.Server.Controllers
             _contactsRepository = contactsRepository;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetContactById/{id}")]
         public async Task<IActionResult> GetContactById(int id)
         {
             var contact = await _contactsRepository.GetContactById(id);
             if (contact == null) return NotFound();
-            return Ok(contact);
+            return Ok(new ResponseModel<Contact>(contact));
         }
 
         [HttpGet("GetAllContacts")]
@@ -63,6 +63,13 @@ namespace DevTest.Server.Controllers
         {
             //var result = await _contactsRepository.Up
             return Ok();
+        }
+
+        [HttpGet("GetUnlinkedClientsByContactId/{contactId}")]
+        public async Task<IActionResult> GetUnlinkedClientsByContactId(int contactId)
+        {
+            var result = await _contactsRepository.GetUnlinkedClientsByContactId(contactId);
+            return Ok(new ResponseModel<List<ClientDto>>(result));
         }
     }
 }

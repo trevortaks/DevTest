@@ -2,15 +2,15 @@
 @inject IToastService toaster
 @inject ClientService clientService
 <div>
+    <div class="row">
+        <div classs="col-6 form-group">
+            <label>Client No</label>
+            <input class="form-control" readonly @bind="client.ClientCode" />
+        </div>
+    </div>
     <EditForm Model="client" OnValidSubmit="@Submit">
         <DataAnnotationsValidator />
         <ValidationSummary />
-        <div class="row">
-            <div classs="col-6 form-group">
-                <label>Client No</label>
-                <InputText class="form-control" readonly @bind-Value="client.ClientCode"/>
-            </div>
-        </div>
         <div class="row">
             <div classs="col-6 form-group">
                 <label>Client Name</label>
@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="mt-4 mb-3">
-            <button type="submit" class="btn btn-primary" disabled ="@(client.ClientID > 0) ">Save Client</button>
+            <button type="submit" class="btn btn-primary" disabled="@(!String.IsNullOrEmpty(client.ClientCode))">Save Client</button>
         </div>
     </EditForm>
 </div>
@@ -37,24 +37,34 @@
         try
         {
             spinner.Show();
+            client.ClientCode = "";
             var response = await clientService.SaveClient(client);
-            if(!response?.Success ?? false)
+
+            if (response == null ){
+                spinner.Hide();
+                toaster.ShowError("Received Empty Response. Refresh page");
+                return;
+            }
+
+            if(!response.Success)
             {
                 spinner.Hide();
                 toaster.ShowError(response?.Message ?? "Something went wrong");
                 return;
             }
 
+            var newClient = response.Content;
 
-
-            client = response?.Content ?? new ClientDb();
+            client.ClientCode = newClient.ClientCode ;
+            client.ClientID = newClient.ClientID;
             StateHasChanged();
+            spinner.Hide();
             toaster.ShowSuccess("Client saved successfully");
         }
         catch (Exception)
         {
-            toaster.ShowError("Error occured on trying to save. Please try again");
             spinner.Hide();
+            toaster.ShowError("Error occured on trying to save. Please try again");
         }
         
     }

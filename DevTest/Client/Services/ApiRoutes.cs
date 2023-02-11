@@ -2,7 +2,7 @@
 {
     public class ApiRoutes
     {
-        public static string GetClientById = "/api/Clients/GetClientById/";
+        public static string GetClientById = "/api/Clients/GetClient/";
         public static string GetAllClients = "/api/Clients/GetAllClients";
         public static string GetAllClientsWithContactCount = "/api/Clients/GetAllClientsWithContactCount";
         public static string GetClientContacts = "/api/Clients/GetClientContacts/";

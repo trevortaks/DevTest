@@ -70,5 +70,12 @@ namespace DevTest.Server.Controllers
             var result = await _clients.UpdateClient(client);
             return Ok(new ResponseModel<bool>(result));
         }
+
+        [HttpGet("GetUnlinkedContactsByClientId/{clientId}")]
+        public async Task<IActionResult> GetUnlinkedContactsByClientId(int clientId)
+        {
+            var result = await _clients.GetUnlinkedContactsByClientId(clientId);
+            return Ok(new ResponseModel<List<ContactDto>>(result));
+        }
     }
 }

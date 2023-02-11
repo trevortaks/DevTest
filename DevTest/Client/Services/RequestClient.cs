@@ -23,7 +23,8 @@ namespace DevTest.Client.Services
         public async Task<ResponseModel<T>?> PostJsonAsync<T>(string url, T model)
         {
             var response = await _httpClient.PostAsJsonAsync(url, model);
-            return JsonSerializer.Deserialize(await response.Content.ReadAsStringAsync(), typeof(ResponseModel<T>)) as ResponseModel<T>;
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize(json, typeof(ResponseModel<T>), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) as ResponseModel<T>;
 
         }
 

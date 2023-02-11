@@ -12,6 +12,7 @@ namespace DevTest.Server.Repositories.Contracts
         Task<ClientDb> GetClientByName(string name);
         Task<ClientDb> GetClientByCode(string code);
         Task<List<ContactDto>> GetContactsByClientId(int clientId);
+        Task<List<ContactDto>> GetUnlinkedContactsByClientId(int clientId);
         Task<int> SaveClient(ClientDb client);
         Task<int> SaveClients(List<ClientDb> clients);
         Task<bool> UpdateClient(ClientDb client);

@@ -48,30 +48,37 @@ else{
         try
         {
             spinner.Show();
-            var response = await clientService.GetAllClientsWithContactCount();
-
-            if(!response?.Success ?? true)
-            {
-                toastr.ShowError(response?.Message ?? "An error occured");
-                spinner.Hide();
-                return;
-            }
-
-            clients = response?.Content ?? new List<ClientDto>();
+            await LoadClients();
             spinner.Hide();
         }
         catch (Exception)
         {
             toastr.ShowError("An error occured on load.Please reload the page");
         }
-        
+
         await base.OnInitializedAsync();
+    }
+
+    public async Task LoadClients()
+    {
+        var response = await clientService.GetAllClientsWithContactCount();
+
+        if (!response?.Success ?? true)
+        {
+            toastr.ShowError(response?.Message ?? "An error occured");
+            spinner.Hide();
+            return;
+        }
+
+        clients = response?.Content ?? new List<ClientDto>();
     }
 
     public async Task AddNewClient()
     {
         var modal = modalService.Show<AddClient>("Create new client");
         await modal.Result;
+        await LoadClients();
     }
+
 
 }
