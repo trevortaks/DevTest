@@ -1,4 +1,5 @@
-﻿using DevTest.Shared.Models;
+﻿using DevTest.Shared.Dtos;
+using DevTest.Shared.Models;
 
 namespace DevTest.Client.Services
 {
@@ -19,6 +20,11 @@ namespace DevTest.Client.Services
         public async Task<List<ClientDb>> GetAllClients()
         {
             return await _client.GetJsonAsync<List<ClientDb>>(ApiRoutes.GetAllClients);
+        }
+
+        public async Task<List<ClientDto>> GetAllClientsWithContactCount()
+        {
+            return await _client.GetJsonAsync<List<ClientDto>>(ApiRoutes.GetAllClientsWithContactCount);
         }
 
         public async Task<int> SaveClient(ClientDb client)

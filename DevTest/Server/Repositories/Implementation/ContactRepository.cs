@@ -38,9 +38,9 @@ namespace DevTest.Server.Repositories.Implementation
         public async Task<bool> CheckEmailIsUnique(string email)
         {
             var sql = "SELECT EmailAddress from tblContacts where EmailAddress = @EmailAddress";
-            string result = await ExecuteQueryFirstOrDefault<string>(sql, new {EmailAddress = email});
+            string? result = await ExecuteQueryFirstOrDefault<string>(sql, new {EmailAddress = email});
 
-            return String.IsNullOrEmpty(result);
+            return !String.IsNullOrEmpty(result);
         }
 
         public async Task<List<Contact>> GetAllContacts()
@@ -48,14 +48,15 @@ namespace DevTest.Server.Repositories.Implementation
             return (List<Contact>)await GetAll();
         }
 
-        Task<List<ClientDto>> IContactRepository.GetClientsByContactId(int contactId)
+        public async Task<List<ContactDto>> GetAllContactsWithClientCount()
         {
-            throw new NotImplementedException();
-        }
+            var sql = "SELECT * FROM (SELECT CO.Name, CO.Surname, CONCAT(CO.Surname, ' ', CO.Name) As FullName, CO.EmailAddress, Count(C.ClientCode) As LinkedClients from tblContacts CO " +
+                " LEFT OUTER JOIN tblClientContacts CC ON CO.ContactID = CC.ContactID " +
+                " LEFT OUTER JOIN tblClients C ON CC.ClientID = C.ClientID" +
+                " GROUP BY CO.Surname, CO.Name, Co.EmailAddress) Contacts" +
+                " ORDER BY Fullname";
 
-        public Task<List<ContactDto>> GetAllContactsWithClientCount()
-        {
-            throw new NotImplementedException();
+            return (List<ContactDto>)await ExecuteQuery<ContactDto>(sql);
         }
     }
 }

@@ -1,13 +1,16 @@
-﻿<div>
+﻿@inject SpinnerService spinner
+@inject IToastService toastr
+@inject ContactService contactService
+<div>
     <EditForm Model="@contact" OnValidSubmit="@Submit">
         <div class="row">
             <div classs="col-6 form-group">
                 <label>Name</label>
-                <InputText class="form-control" readonly @bind-Value="@contact.Name" />
+                <InputText class="form-control" @bind-Value="@contact.Name" />
             </div>
             <div classs="col-6 form-group">
                 <label>Surname</label>
-                <InputText class="form-control" readonly @bind-Value="@contact.Surname" />
+                <InputText class="form-control" @bind-Value="@contact.Surname" />
             </div>
         </div>
         <div class="row">
@@ -26,9 +29,22 @@
 @code {
     Contact contact = new Contact();
 
-    private void Submit()
+    private async void Submit()
     {
+        //try
+        //{
+            spinner.Show();
+            int contactId = await contactService.SaveContact(contact);
+            contact = await contactService.GetContactById(contactId);
+            spinner.Hide();
 
+            toastr.ShowSuccess("Contact saved sucessfully");
+        //}
+        //catch (Exception)
+        //{
+        //    spinner.Hide();
+        //    toastr.ShowError("Error occured on saving.Please try again"); 
+        //}
     }
 
 }

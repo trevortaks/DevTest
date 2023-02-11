@@ -7,7 +7,7 @@ namespace DevTest.Shared.Models
     {
         [Key]
         public int ClientID { get; set; }
-        public string ClientNo { get; set; }
+        public string ClientCode { get; set; }
         [System.ComponentModel.DataAnnotations.Required]
         public string Name { get; set; }
     }

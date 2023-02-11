@@ -7,7 +7,7 @@ namespace DevTest.Server.Repositories.Contracts
     public interface IClientRepository
     {
         Task<List<ClientDb>> GetAllClients();
-        Task<List<ClientDb>> GetAllClientsWithContactCount();
+        Task<List<ClientDto>> GetAllClientsWithContactCount();
         Task<ClientDb> GetClientById(int clientId);
         Task<ClientDb> GetClientByName(string name);
         Task<ClientDb> GetClientByCode(string code);

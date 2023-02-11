@@ -25,6 +25,14 @@ namespace DevTest.Server.Controllers
             return Ok(clients);
         }
 
+        [HttpGet("GetAllClientsWithContactCount")]
+        public async Task<IActionResult> GetAllClientsWithContactCount()
+        {
+            var clients = await _clients.GetAllClientsWithContactCount();
+
+            return Ok(clients);
+        }
+
         [HttpGet("GetClient/{id}")]
         public async Task<IActionResult> GetClientById(int id)
         {

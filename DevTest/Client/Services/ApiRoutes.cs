@@ -4,6 +4,7 @@
     {
         public static string GetClientById = "/api/Clients/GetClientById/";
         public static string GetAllClients = "/api/Clients/GetAllClients";
+        public static string GetAllClientsWithContactCount = "/api/Clients/GetAllClientsWithContactCount";
         public static string GetClientContacts = "/api/Clients/GetClientContacts/";
         public static string SaveClient = "/api/Clients/SaveClient";
         public static string UpdateClient = "/api/Clients/UpdateClient";

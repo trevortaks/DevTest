@@ -32,9 +32,9 @@ namespace DevTest.Client.Services
             return await _client.GetJsonAsync<List<ClientDto>>(ApiRoutes.GetContactClients + contactId.ToString());
         }
 
-        public async Task SaveContact(Contact contact)
+        public async Task<int> SaveContact(Contact contact)
         {
-            await _client.PostJsonAsync(ApiRoutes.SaveContact, contact);
+            return await _client.PostJsonAsync(ApiRoutes.SaveContact, contact);
         }
 
         public async Task UpdateContact(Contact contact)

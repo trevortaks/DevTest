@@ -40,14 +40,14 @@ namespace DevTest.Server.Repositories.Implementation
             return contacts.ToList();
         }
 
-        public async Task<List<ClientDb>> GetAllClientsWithContactCount()
+        public async Task<List<ClientDto>> GetAllClientsWithContactCount()
         {
-            var sql = "SELECT C.ClientID, C.ClientCode, C.Name, COUNT(CO.ContactID) from tblClients C" +
-                            " INNER JOIN tblClientContacts CC ON CC.ClientID = C.ClientID" +
-                            " INNER JOIN tblContacts CO ON CC.ContactID = CO.ContactID" +
-                            " GROUP BY C.ClientID, C.Name, C.Code" +
+            var sql = "SELECT C.ClientID, C.ClientCode, C.Name, ISNULL(COUNT(CO.ContactID),0) As LinkedContacts from tblClients C" +
+                            " LEFT OUTER JOIN tblClientContacts CC ON CC.ClientID = C.ClientID" +
+                            " LEFT OUTER JOIN tblContacts CO ON CC.ContactID = CO.ContactID" +
+                            " GROUP BY C.ClientID, C.Name, C.ClientCode" +
                             " ORDER BY C.Name";
-            var contacts = await ExecuteQuery<ClientDb>(sql);
+            var contacts = await ExecuteQuery<ClientDto>(sql);
             return contacts.ToList();
         }
 
@@ -55,7 +55,7 @@ namespace DevTest.Server.Repositories.Implementation
         {
             string prefix = GenerateClientPrefix(client.Name);
             int code = await GetNextNumberInSeuence(prefix);
-            client.ClientNo = prefix + code.ToString("000");
+            client.ClientCode = prefix + code.ToString("000");
 
             return await Create(client);
         }

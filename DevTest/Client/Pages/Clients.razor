@@ -29,8 +29,8 @@ else{
             {
                 <tr>
                     <td>@client.Name</td>
-                    <td>@client.ClientNo</td>
-                    <td></td>
+                    <td>@client.ClientCode</td>
+                    <td>@client.LinkedContacts</td>
                 </tr>
             }
         </tbody>
@@ -41,14 +41,14 @@ else{
 @code {
     [CascadingParameter] public IModalService modalService { get; set; } = default!;
 
-    List<ClientDb> clients = new List<ClientDb>();
+    List<ClientDto> clients = new List<ClientDto>();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             spinner.Show();
-            clients = await clientService.GetAllClients();
+            clients = await clientService.GetAllClientsWithContactCount();
             spinner.Hide();
         }
         catch (Exception)

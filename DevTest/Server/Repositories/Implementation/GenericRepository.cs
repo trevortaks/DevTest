@@ -39,7 +39,7 @@ namespace DevTest.Server.Repositories.Implementation
         {
             using (IDbConnection connection = new SqlConnection(_connectionstring))
             {
-                return await connection.QueryFirstAsync<TP>(sql, param);
+                return await connection.QueryFirstOrDefaultAsync<TP>(sql, param);
             }
         }
 
