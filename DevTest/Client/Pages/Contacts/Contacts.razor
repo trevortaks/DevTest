@@ -3,7 +3,7 @@
 @inject SpinnerService spinner
 @inject IToastService toastr
 
-<h2>List of Clients</h2>
+<h2>List of Contacts</h2>
 
 <div class="row">
     <div class="col-12 d-flex my-3">
@@ -20,7 +20,8 @@ else
     <table class="table table-primary table-striped">
         <thead>
             <tr>
-                <td>Full Name</td>
+                <td>Name</td>
+                <td>Surname</td>
                 <td>Email Address</td>
                 <td>No. of linked clients</td>
                 <td></td>
@@ -30,9 +31,10 @@ else
             @foreach (var contact in _contacts)
             {
                 <tr onclick="document.location = 'ViewContact/@contact.ContactId.ToString()'">
-                    <td>@contact.FullName</td>
+                    <td>@contact.Name</td>
+                    <td>@contact.Surname</td>
                     <td>@contact.EmailAddress</td>
-                    <td>@contact.LinkedClients</td>
+                    <td align="center">@contact.LinkedClients</td>
                     <td></td>
                 </tr>
             }
@@ -80,7 +82,7 @@ else
 
     public async Task AddNewContact()
     {
-        var modal = modalService.Show<AddContact>("Create new client");
+        var modal = modalService.Show<AddContact>("Create new contact");
         await modal.Result;
         await LoadContacts();
     }

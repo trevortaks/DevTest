@@ -45,7 +45,7 @@ namespace DevTest.Server.Controllers
             return Ok(new ResponseModel<ClientDb>(client));
         }
 
-        [HttpGet("/GetClientContacts/{id}")]
+        [HttpGet("GetClientContacts/{id}")]
         public async Task<IActionResult> GetClientContacts(int id)
         {
             var contacts = await _clients.GetContactsByClientId(id);

@@ -33,9 +33,9 @@ namespace DevTest.Client.Services
             return await _client.PostJsonAsync(ApiRoutes.SaveClient, client);
         }
 
-        public async Task<ResponseModel<List<Contact>>?> GetClientContacts(int clientId)
+        public async Task<ResponseModel<List<ContactDto>>?> GetClientContacts(int clientId)
         {
-            return await _client.GetJsonAsync<List<Contact>>(ApiRoutes.GetClientContacts + clientId.ToString());
+            return await _client.GetJsonAsync<List<ContactDto>>(ApiRoutes.GetClientContacts + clientId.ToString());
         }
 
         public async Task<ResponseModel<List<ClientDto>>?> GetUnlinkedClientsByContactId(int contactId)
@@ -45,12 +45,12 @@ namespace DevTest.Client.Services
 
         public async Task<ResponseModel<ContactClient>?> LinkClient(ContactClient link)
         {
-            return await _client.PostJsonAsync("", link);
+            return await _client.PostJsonAsync(ApiRoutes.LinkClient, link);
         }
 
         public async Task<ResponseModel<bool>?> UnlinkClient(ContactClient link)
         {
-            return await _client.DeleteJsonAsync<ContactClient>("" + "?contactId = " + link.ContactId + "clientId=" + link.ClientId);
+            return await _client.DeleteJsonAsync<ContactClient>(ApiRoutes.Unlinkclient + "?contactId = " + link.ContactId + "clientId=" + link.ClientId);
         }
     }
 }

@@ -64,7 +64,7 @@ namespace DevTest.Server.Repositories.Implementation
         {
             var sql = "SELECT * FROM tblClients" +
                         " WHERE ClientID NOT IN (SELECT ClientID FROM tblClientContacts WHERE ContactID = @ContactID)";
-            return (List<ClientDto>)await ExecuteQuery<List<ContactDto>>(sql, new { ContactID = contactId });
+            return (List<ClientDto>)await ExecuteQuery<ClientDto>(sql, new { ContactID = contactId });
         }
     }
 }

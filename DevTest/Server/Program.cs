@@ -1,3 +1,4 @@
+using DevTest.Server.Middleware;
 using DevTest.Server.Repositories.Contracts;
 using DevTest.Server.Repositories.Implementation;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -43,7 +44,7 @@ namespace DevTest
             app.MapRazorPages();
             app.MapControllers();
             app.MapFallbackToFile("index.html");
-
+            app.UseMiddleware<ExceptionMiddleware>();
             app.Run();
         }
     }

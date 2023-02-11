@@ -31,10 +31,10 @@ namespace DevTest.Server.Repositories.Implementation
 
         public async Task<List<ContactDto>> GetContactsByClientId(int clientId)
         {
-            var sql = "SELECT * FROM (SELECT CONCAT(C.Surname, C.Firstname) As FullName C.* FROM tblContacts CO " +
+            var sql = "SELECT * FROM (SELECT CONCAT(CO.Surname, ' ', CO.Name) As FullName, CO.* FROM tblContacts CO " +
                             " INNER JOIN tblClientContacts CC ON CC.ContactID = CO.ContactID" +
                             " INNER JOIN tblClients C ON C.ClientID = CC.ClientID" +
-                            " WHERE C.ClientID = @ClientId)" +
+                            " WHERE C.ClientID = @ClientId) Contacts" +
                             " ORDER BY FullName";
             var contacts = await ExecuteQuery<ContactDto>(sql, new { ClientId = clientId });
             return contacts.ToList();
@@ -106,7 +106,7 @@ namespace DevTest.Server.Repositories.Implementation
             return await Update(client);
         }
 
-        public async Task<bool> updateClients(List<ClientDb> clients)
+        public async Task<bool> UpdateClients(List<ClientDb> clients)
         {
             return await UpdateRange(clients);
         }
@@ -120,8 +120,23 @@ namespace DevTest.Server.Repositories.Implementation
         public async Task<List<ContactDto>> GetUnlinkedContactsByClientId(int clientId)
         {
             var sql = "SELECT * FROM tblContacts " +
-                " WHERE ContactID NOT IN (SELECT ContactID FROM tblClientContacts WHERE Client= @ClientId)";
-            return (List<ContactDto>)await ExecuteQuery<List<ContactDto>>(sql, new { ClientId = clientId });
+                " WHERE ContactID NOT IN (SELECT ContactID FROM tblClientContacts WHERE ClientID = @ClientId)";
+            return (List<ContactDto>)await ExecuteQuery<ContactDto>(sql, new { ClientId = clientId });
         }
+
+        public async Task<ContactClient> CreateLink(ContactClient link)
+        {
+            var sql = "INSERT INTO tblClientContacts(ClientID, ContactID) VALUES (@ClientID, @ContactID)";
+            await ExecuteNonQuery(sql, new { ClientID = link.ClientId, ContactID = link.ContactId });
+            return link;
+        }
+
+        public async Task<bool> DeleteLink(ContactClient link)
+        {
+            var sql = "DELETE FROM tblClientContacts WHERE ContactID = @ContactID AND ClientID = @ClientID";
+            var result = await ExecuteNonQuery(sql, new { ContactID = link.ContactId, ClientID = link.ClientId });
+            return result > 0;
+        }
+
     }
 }

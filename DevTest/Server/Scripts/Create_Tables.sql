@@ -31,11 +31,11 @@ BEGIN
 		[ContactID] INT NOT NULL
 	)
 
-	ALTER TABLE tblClientContacts 
+	ALTER TABLE tblClientContacts WITH CHECK
 		ADD CONSTRAINT FK_ClientID FOREIGN KEY(ClientID)
 			REFERENCES tblClients(ClientID)
 
-	ALTER TABLE tblClientContacts
-		ADD CONSTRAINT FK_ContactID FOREIGN KEY(ClientID)
-			REFERENCES tblContacts(ContactID)
+	ALTER TABLE [dbo].[tblClientContacts]  WITH CHECK
+		ADD  CONSTRAINT [FK_ContactID] FOREIGN KEY([ContactID])
+			REFERENCES [dbo].[tblContacts] ([ContactID])
 END

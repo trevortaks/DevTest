@@ -16,7 +16,8 @@ namespace DevTest.Server.Repositories.Contracts
         Task<int> SaveClient(ClientDb client);
         Task<int> SaveClients(List<ClientDb> clients);
         Task<bool> UpdateClient(ClientDb client);
-        Task<bool> updateClients(List<ClientDb> clients);
-
+        Task<bool> UpdateClients(List<ClientDb> clients);
+        Task<ContactClient> CreateLink(ContactClient link);
+        Task<bool> DeleteLink(ContactClient link);
     }
 }

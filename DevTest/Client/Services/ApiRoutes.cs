@@ -15,9 +15,9 @@
         public static string GetContactClients = "/api/Contacts/GetContactClients/";
         public static string SaveContact = "/api/Contacts/SaveContact";
         public static string UpdateContact = "/api/Contacts/UpdateContact";
-        internal static string GetUnlinkedClientsByContactId = "/api/Contacts/GetUnlinkedClientsByContactId";
-        internal static string LinkClient = "/api/Links";
-        internal static string Unlinkclient = "/api/Links";
-        internal static string GetUnlinkedContactsByClientId = "/api/Clients/GetUnlinkedContactsByClientId";
+        internal static string GetUnlinkedClientsByContactId = "/api/Contacts/GetUnlinkedClientsByContactId/";
+        internal static string LinkClient = "/api/Links/CreateLink";
+        internal static string Unlinkclient = "/api/Links/DeleteLink";
+        internal static string GetUnlinkedContactsByClientId = "/api/Clients/GetUnlinkedContactsByClientId/";
     }
 }

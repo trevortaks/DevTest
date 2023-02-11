@@ -3,17 +3,12 @@
 @inject SpinnerService spinner
 @inject IToastService toastr
 
-<ul class="nav nav-tabs">
-    <li class="nav-item">
-        <a href="#general" @onclick:preventDefault class="nav-link active" data-target="#general" data-toggle="tab" id="general-tab">General</a>
-    </li>
-    <li class="nav-item">
-        <a href="#contacts" @onclick:preventDefault class="nav-link" data-target="#contacts" data-toggle="tab" id="contacts-tab">Contacts</a>
-    </li>
-</ul>
-<div class="tab-content" id="tabContent">
-    <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
-        <EditForm Model="Contact" >
+<div class="mt-4 mb-4">
+    <button class="btn btn-outline-primary" @onclick="@ShowModal">Link Clients</button>
+</div>
+<TabControl>
+    <TabPage Text="General">
+        <EditForm Model="Contact">
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
@@ -37,8 +32,11 @@
                 </div>
             </div>
         </EditForm>
-    </div>
-    <div class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
+    </TabPage>
+    <TabPage Text="Contacts">
+        <div class='mb-4'>
+            <h3>Linked Contacts</h3>
+        </div>
         @if (clients.Count < 1)
         {
             <h2>No Clients Found</h2>
@@ -65,15 +63,18 @@
                 </tbody>
             </table>
         }
-    </div>
-</div>
+    </TabPage>
+</TabControl>
 
 @code {
     [Parameter]
     public int contactId { get; set; }
 
+    [CascadingParameter]
+    public IModalService modalService { get; set; }
+
     public Contact Contact = new Contact();
-    public List<ClientDb> clients = new List<ClientDb>();
+    public List<ClientDto> clients = new List<ClientDto>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,7 +82,8 @@
         try
         {
             var response = await contactService.GetContactById(contactId);
-            if (!response?.Success ?? true)
+            var result = await GetLinkedClients(contactId);
+            if (!response?.Success ?? true && result)
             {
                 spinner.Hide();
                 toastr.ShowError(response?.Message ?? "Something went wrong");
@@ -92,10 +94,33 @@
         }
         catch (Exception e)
         {
-             Console.WriteLine(e);
+            Console.WriteLine(e);
             toastr.ShowError("Error occured on load. Please reload the page");
         }
         spinner.Hide();
         await base.OnInitializedAsync();
+    }
+
+    private async Task<bool> GetLinkedClients(int contactId)
+    {
+        var response = await contactService.GetContactClients(contactId);
+        if (response == null) return false;
+        if(response.Success){
+            clients = response.Content;
+            return true;
+        }
+        return false;
+    }
+
+    private async void ShowModal()
+    {
+        var parameters = new ModalParameters();
+        parameters.Add("ContactId", contactId);
+        var modal = modalService.Show<LinkClient>("", parameters);
+        await modal.Result;
+        if(!await GetLinkedClients(contactId)){
+            toastr.ShowError("Failed to refresh data. Please reload page");
+        }
+
     }
 }

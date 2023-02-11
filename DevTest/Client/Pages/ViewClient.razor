@@ -4,16 +4,12 @@
 @inject IToastService toaster
 
 <h2>Client Details</h2>
-<ul class="nav nav-tabs">
-    <li class="nav-item">
-        <a href="#general" @onclick:preventDefault class="nav-link cursor-pointer active" id="general-tab" data-toggle="tab" data-target="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
-    </li>
-    <li class="nav-item">
-        <a href="#contacts" @onclick:preventDefault class="nav-link cursor-pointer" id="contacts-tab" data-toggle="tab" data-target="#contacts" role="tab" aria-controls="general" aria-selected="true">Contacts</a>
-    </li>
-</ul>
-<div class="tab-content" id="tabContent">
-    <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+<div class="mt-4 mb-4">
+    <button class="btn btn-outline-primary" @onclick="@ShowModal">Link Contacts</button>
+</div>
+
+<TabControl>
+    <TabPage Text="General">
         <EditForm Model="client">
             <div class="row">
                 <div class="col-6">
@@ -30,50 +26,52 @@
                 </div>
             </div>
         </EditForm>
+    </TabPage>
+    <TabPage Text="Contact(s)">
         
-    </div>
-    <div class="tab-pane fade " id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
         @if (contacts.Count < 1)
-       {
-           <h2>No Contact()s Found</h2>
-       }
-       else
-       {
-           <table class="table table-hover table-striped table-bordered">
-               <thead class="thead-primary">
-                   <tr>
-                       <th>Contact Full Name</th>
-                       <th>Contact email address</th>
-                       <th></th>
-                   </tr>
-               </thead>
-               <tbody>
+        {
+            <h2>No Contacts Found</h2>
+        }
+        else
+        {
+            <table class="table table-hover table-striped table-bordered">
+                <thead class="thead-primary">
+                    <tr>
+                        <th>Contact Full Name</th>
+                        <th>Contact email address</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
                     @foreach (var contact in contacts)
-                   {
-                       <tr>
-                           <td>@contact.Surname @contact.Name </td>
-                           <td>@contact.EmailAddress</td>
-                           <td><a href="" class="btn btn-primary btn-link">Unlink</a></td>
-                       </tr>
-                   }
-               </tbody>
-           </table>
-       }
-    </div>
-</div>
+                    {
+                        <tr>
+                            <td>@contact.Surname @contact.Name </td>
+                            <td>@contact.EmailAddress</td>
+                            <td><a href="" class="btn btn-primary btn-link">Unlink</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </TabPage>
+</TabControl>
 
 @code {
-    [Parameter]
-    public int clientId { get; set; }
+    [CascadingParameter] public IModalService modalService { get; set; }
+    [Parameter] public int clientId { get; set; }
 
     public ClientDb client = new ClientDb();
-    public List<Contact> contacts = new List<Contact>();
+    public List<ContactDto> contacts = new List<ContactDto>();
 
     protected override async Task OnInitializedAsync()
     {   try
         {
             spinner.Show();
+
             var response = await clientService.GetClientById(clientId);
+            await GetClientContacts(clientId);
 
             if (!response?.Success ?? true)
             {
@@ -84,8 +82,9 @@
             client = response?.Content ?? new ClientDb();
             spinner.Hide();
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Console.WriteLine(e);
             toaster.ShowError("An error occured on load.Please reload the page");
         }
         finally{
@@ -95,16 +94,26 @@
         await base.OnInitializedAsync();
     }
 
-    public async Task<string> GetClientContacts(int clientId)
+    public async Task<bool> GetClientContacts(int clientId)
     {
         var _contacts = await clientService.GetClientContacts(clientId);
 
         if (!_contacts?.Success ?? false)
         {
-            return _contacts?.Message ?? "Failed to get linked contacts";
+            toaster.ShowError(_contacts?.Message ?? "Failed to get linked contacts");
+            return false;
         }
 
-        contacts = _contacts?.Content ?? new List<Contact>();
-        return String.Empty;
+        contacts = _contacts?.Content ?? new List<ContactDto>();
+        return true;
+    }
+
+    public async void ShowModal(){
+        var parameters = new ModalParameters();
+        parameters.Add("ClientId", clientId);
+        var modal = modalService.Show<LinkContact>("",  parameters);
+        await modal.Result;
+        await GetClientContacts(clientId);
+        StateHasChanged();
     }
 }
