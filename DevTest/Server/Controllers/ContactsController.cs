@@ -52,6 +52,16 @@ namespace DevTest.Server.Controllers
         [HttpPost("SaveContact")]
         public async Task<IActionResult> SaveContact([FromBody]Contact contact)
         {
+            if (contact == null)
+            {
+                return BadRequest(new ResponseModel() { Success = false, Message = "Data not supplied" });
+            }
+
+            if (String.IsNullOrEmpty(contact.Name) || String.IsNullOrEmpty(contact.Surname) || String.IsNullOrEmpty(contact.EmailAddress) )
+            {
+                return BadRequest(new ResponseModel() { Success = false, Message = "Insufficient Data supplied" });
+            }
+
             var result = await _contactsRepository.SaveContact(contact);
             var newContact = await _contactsRepository.GetContactById(result);
 

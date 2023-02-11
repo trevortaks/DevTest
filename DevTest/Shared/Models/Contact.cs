@@ -9,11 +9,11 @@ namespace DevTest.Shared.Models
     {
         [KeyAttribute]
         public int ContactId { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Please enter a name")]
         public string Name { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Please enter a surname")]
         public string Surname { get; set; }
-        [EmailAddress,Required]
+        [Required(ErrorMessage = "An email address is required"), EmailAddress(ErrorMessage = "Please enter a valid email address")]
         public string EmailAddress { get; set; }
     }
 }

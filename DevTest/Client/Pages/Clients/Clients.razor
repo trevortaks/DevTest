@@ -2,12 +2,13 @@
 @inject ClientService clientService
 @inject SpinnerService spinner
 @inject IToastService toastr
+@inject NavigationManager navigator
 
 <h2>List of Clients</h2>
 
 <div class="row">
     <div class="col-12 d-flex my-3">
-        <a @onclick="AddNewClient" class="btn btn-outline-primary">Add New Client </a>
+        <a @onclick="@(()=>Navigate(0))" class="btn btn-outline-primary">Add New Client </a>
     </div>
 </div>
 
@@ -16,18 +17,18 @@
     <h3>No client(s) found</h3>
 }
 else{
-    <table class="table table-primary table-striped">
+    <table class="table table-dark table-hover table-striped table-bordered">
         <thead>
             <tr>
                 <td>Name</td>
                 <td>Client code</td>
-                <td>No. of linked contacts</td>
+                <td align="center" >No. of linked contacts</td>
             </tr>
         </thead>
         <tbody>
             @foreach (var client in clients)
             {
-                <tr onclick="document.location = 'ViewClient/@client.ClientID.ToString()'">
+                <tr @onclick="@(()=>Navigate(client.ClientID))" style="cursor:pointer">
                     <td>@client.Name</td>
                     <td>@client.ClientCode</td>
                     <td align="center">@client.LinkedContacts</td>
@@ -71,6 +72,11 @@ else{
         }
 
         clients = response?.Content ?? new List<ClientDto>();
+    }
+
+    private void Navigate(int contactId)
+    {
+        navigator.NavigateTo($"ViewClient/{contactId}");
     }
 
     public async Task AddNewClient()

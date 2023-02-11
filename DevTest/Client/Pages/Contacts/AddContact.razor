@@ -5,21 +5,23 @@
 <div>
     <EditForm Model="@_contact" OnValidSubmit="@Submit">
         <DataAnnotationsValidator />
-        <ValidationSummary />
         <div class="row">
             <div classs="col-6 form-group">
                 <label>Name</label>
                 <InputText class="form-control" @bind-Value="_contact.Name" />
+                <ValidationMessage For="@(() => _contact.Name)" />
             </div>
             <div classs="col-6 form-group">
                 <label>Surname</label>
                 <InputText class="form-control" @bind-Value="_contact.Surname" />
+                <ValidationMessage For="@(() => _contact.Surname)" />
             </div>
         </div>
         <div class="row">
             <div classs="col-6 form-group">
                 <label>Email Address</label>
                 <InputText class="form-control" @bind-Value="_contact.EmailAddress" />
+                <ValidationMessage For="@(() => _contact.EmailAddress)" />
             </div>
         </div>
         <div class="mt-4 mb-3">

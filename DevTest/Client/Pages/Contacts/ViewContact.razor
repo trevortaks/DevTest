@@ -4,46 +4,50 @@
 @inject IToastService toastr
 @inject NavigationManager navigator
 <div class="mt-4 mb-4">
-    <button class="btn btn-outline-primary" @onclick="@ShowModal">Link Clients</button>
+    <button class="btn btn-outline-primary" @onclick="@ShowModal" style='visibility: @(_contact.ContactId > 0 ? "visible" : "hidden")' >Link Clients</button>
 </div>
 <TabControl>
     <TabPage Text="General">
-        <EditForm Model="Contact">
-            <div class="row">
-                <div class="col-6">
+        <EditForm Model="_contact" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <div class="row mb-3">
+                <div class="col-4">
                     <div class="form-group">
                         <label>Name</label>
-                        <InputText class="form-control" @bind-Value="Contact.Name" />
+                        <InputText class="form-control" @bind-Value="_contact.Name" />
+                        <ValidationMessage For="@(()=>_contact.Name)" />
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
                     <div class="form-group">
                         <label>Surname</label>
-                        <InputText class="form-control" @bind-Value="Contact.EmailAddress" />
+                        <InputText class="form-control" @bind-Value="_contact.Surname" />
+                        <ValidationMessage For="@(()=>_contact.Surname)" />
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-6">
+            <div class="row mb-3">
+                <div class="col-4">
                     <div class="form-group">
                         <label>Email Address</label>
-                        <InputText class="form-control" @bind-Value="Contact.EmailAddress" />
+                        <InputText class="form-control" @bind-Value="_contact.EmailAddress" />
+                        <ValidationMessage For="@(()=>_contact.EmailAddress)" />
                     </div>
                 </div>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary" style='visibility: @(_contact.ContactId > 0 ?  "hidden" : "visible" )'>Save Contact</button>
             </div>
         </EditForm>
     </TabPage>
-    <TabPage Text="Contacts">
-        <div class='mb-4'>
-            <h3>Linked Contacts</h3>
-        </div>
+    <TabPage Text="Client(s)">
         @if (clients.Count < 1)
         {
             <h2>No Clients Found</h2>
         }
         else
         {
-            <table class="table table-striped table-bordered">
+            <table class="table table-striped table-dark table-hover table-bordered">
                 <thead>
                     <tr>
                         <th>Client Name</th>
@@ -57,7 +61,7 @@
                         <tr>
                             <td>@client.Name </td>
                             <td>@client.ClientCode</td>
-                            <td><a href='@($"/Unlink/?contactId={contactId}&clientId={client.ClientID}")' class="btn btn-primary btn-link">Unlink</a></td>
+                            <td><a href='@($"/Unlink/{contactId}/{client.ClientID}")' class="btn btn-primary btn-link">Unlink</a></td>
                         </tr>
                     }
                 </tbody>
@@ -73,31 +77,35 @@
     [CascadingParameter]
     public IModalService modalService { get; set; }
 
-    public Contact Contact = new Contact();
+    public Contact _contact = new Contact();
     public List<ClientDto> clients = new List<ClientDto>();
 
     protected override async Task OnInitializedAsync()
     {
-        spinner.Show();
-        try
+        if (contactId > 0)
         {
-            var response = await contactService.GetContactById(contactId);
-            var result = await GetLinkedClients(contactId);
-            if (!response?.Success ?? true && result)
+            spinner.Show();
+            try
             {
-                spinner.Hide();
-                toastr.ShowError(response?.Message ?? "Something went wrong");
-                return;
-            }
+                var response = await contactService.GetContactById(contactId);
+                var result = await GetLinkedClients(contactId);
+                if (!response?.Success ?? true && result)
+                {
+                    spinner.Hide();
+                    toastr.ShowError(response?.Message ?? "Something went wrong");
+                    return;
+                }
 
-            Contact = response?.Content ?? new Contact();
+                _contact = response?.Content ?? new Contact();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                toastr.ShowError("Error occured on load. Please reload the page");
+            }
+            spinner.Hide();
         }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            toastr.ShowError("Error occured on load. Please reload the page");
-        }
-        spinner.Hide();
+
         await base.OnInitializedAsync();
     }
 
@@ -126,5 +134,49 @@
             toastr.ShowError("Failed to refresh data. Please reload page");
         }
 
+    }
+
+    private async void Submit()
+    {
+        try
+        {
+            spinner.Show();
+            if (_contact.ContactId <= 0)
+            {
+                ResponseModel<Contact>? contact = await contactService.SaveContact(_contact);
+                if (!contact?.Success ?? true)
+                {
+                    spinner.Hide();
+                    toastr.ShowError(contact?.Message ?? "Something went wrong");
+                    return;
+                }
+
+                _contact = contact?.Content ?? new Contact();
+                contactId = _contact.ContactId;
+                spinner.Hide();
+                StateHasChanged();
+                toastr.ShowSuccess("Contact saved sucessfully");
+            }
+            else
+            {
+                var _result = await contactService.UpdateContact(_contact);
+                if (!_result?.Success ?? true)
+                {
+                    spinner.Hide();
+                    toastr.ShowError(_result?.Message ?? "Something went wrong");
+                    return;
+                }
+
+                spinner.Hide();
+                StateHasChanged();
+                toastr.ShowSuccess("Contact updated sucessfully");
+            }
+
+        }
+        catch (Exception)
+        {
+            spinner.Hide();
+            toastr.ShowError("Error occured on saving.Please try again");
+        }
     }
 }

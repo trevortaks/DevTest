@@ -1,0 +1,170 @@
+﻿@page "/ViewClient/{clientId:int}"
+@inject ClientService clientService
+@inject SpinnerService spinner
+@inject IToastService toaster
+
+<h2>Client Details</h2>
+<div class="mt-4 mb-4">
+    <button class="btn btn-outline-primary" @onclick="@ShowModal" style='visibility: @(client.ClientID > 0 ? "visible" : "hidden")'>Link Contacts</button>
+</div>
+
+<TabControl>
+    <TabPage Text="General">
+        
+            <div class="row mb-3">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label>Client Code</label>
+                        <input class="form-control" readonly @bind="client.ClientCode"/>
+                    </div>
+                </div>
+            </div>
+            <EditForm Model="client" OnValidSubmit="Submit">
+                <div class="col-4 mb-3">
+                    <div class="form-group">
+                        <label>Client Name</label>
+                        <InputText class="form-control" @bind-Value="client.Name" />
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit" style='visibility: @(client.ClientID > 0 ? "hidden" : "visible")'>Save Client</button>
+                    </div>
+                </div>
+            </EditForm>
+        
+    </TabPage>
+    <TabPage Text="Contact(s)">
+        
+        @if (contacts.Count < 1)
+        {
+            <h2>No Contacts Found</h2>
+        }
+        else
+        {
+            <table class="table table-dark table-hover table-striped table-bordered">
+                <thead class="thead-primary">
+                    <tr>
+                        <th>Contact Full Name</th>
+                        <th>Contact email address</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var contact in contacts)
+                    {
+                        <tr>
+                            <td>@contact.Surname @contact.Name </td>
+                            <td>@contact.EmailAddress</td>
+                            <td><a href='@($"/Unlink/{contact.ContactId}/{clientId}")' class="btn btn-primary btn-link">Unlink</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </TabPage>
+</TabControl>
+
+@code {
+    [CascadingParameter] public IModalService modalService { get; set; }
+    [Parameter] public int clientId { get; set; }
+
+    public ClientDb client = new ClientDb();
+    public List<ContactDto> contacts = new List<ContactDto>();
+
+    protected override async Task OnInitializedAsync()
+    {   
+        if (clientId > 0)
+        {
+            try
+            {
+                spinner.Show();
+
+                var response = await clientService.GetClientById(clientId);
+                await GetClientContacts(clientId);
+
+                if (!response?.Success ?? true)
+                {
+                    spinner.Hide();
+                    toaster.ShowError(response?.Message ?? "Something went wrong");
+                }
+
+                client = response?.Content ?? new ClientDb();
+                spinner.Hide();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                toaster.ShowError("An error occured on load.Please reload the page");
+            }
+            finally
+            {
+                spinner.Hide();
+            }
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    public async Task<bool> GetClientContacts(int clientId)
+    {
+        var _contacts = await clientService.GetClientContacts(clientId);
+
+        if (!_contacts?.Success ?? false)
+        {
+            toaster.ShowError(_contacts?.Message ?? "Failed to get linked contacts");
+            return false;
+        }
+
+        contacts = _contacts?.Content ?? new List<ContactDto>();
+        return true;
+    }
+
+    public async void ShowModal(){
+        var parameters = new ModalParameters();
+        parameters.Add("ClientId", clientId);
+        var modal = modalService.Show<LinkContact>("",  parameters);
+        await modal.Result;
+        await GetClientContacts(clientId);
+        StateHasChanged();
+    }
+
+    private async void Submit()
+    {
+        try
+        {
+            spinner.Show();
+            client.ClientCode = "";
+            var response = await clientService.SaveClient(client);
+
+            if (response == null)
+            {
+                spinner.Hide();
+                toaster.ShowError("Received Empty Response. Refresh page");
+                return;
+            }
+
+            if (!response.Success)
+            {
+                spinner.Hide();
+                toaster.ShowError(response?.Message ?? "Something went wrong");
+                return;
+            }
+
+            var newClient = response.Content;
+
+            client.ClientCode = newClient.ClientCode;
+            client.ClientID = newClient.ClientID;
+            clientId = client.ClientID;
+            StateHasChanged();
+            spinner.Hide();
+            toaster.ShowSuccess("Client saved successfully");
+        }
+        catch (Exception)
+        {
+            spinner.Hide();
+            toaster.ShowError("Error occured on trying to save. Please try again");
+        }
+
+    }
+}

@@ -23,7 +23,6 @@ namespace DevTest.Server.Middleware
             }
             catch (Exception ex)
             {
-                //_logger.LogError($"Something went wrong: {ex}");
                 await HandleExceptionAsync(httpContext, ex);
             }
         }
