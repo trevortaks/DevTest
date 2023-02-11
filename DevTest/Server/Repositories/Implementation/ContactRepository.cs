@@ -66,5 +66,20 @@ namespace DevTest.Server.Repositories.Implementation
                         " WHERE ClientID NOT IN (SELECT ClientID FROM tblClientContacts WHERE ContactID = @ContactID)";
             return (List<ClientDto>)await ExecuteQuery<ClientDto>(sql, new { ContactID = contactId });
         }
+
+        public async Task<bool> UpdateContact(Contact contact)
+        {
+            var oldContact = await GetById(contact.ContactId);
+
+            if (oldContact.EmailAddress == contact.EmailAddress)
+            {
+                if (await CheckEmailIsUnique(contact.EmailAddress))
+                {
+                    throw new Exception("Email already exists");
+                }
+            }
+            
+            return await Update(contact);
+        }
     }
 }

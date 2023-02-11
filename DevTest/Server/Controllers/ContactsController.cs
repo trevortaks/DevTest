@@ -71,8 +71,18 @@ namespace DevTest.Server.Controllers
         [HttpPut("UpdateContact")]
         public async Task<IActionResult> UpdateContact([FromBody]Contact contact)
         {
-            //var result = await _contactsRepository.Up
-            return Ok();
+            if (contact == null)
+            {
+                return BadRequest(new ResponseModel() { Success = false, Message = "Data not supplied" });
+            }
+
+            if (String.IsNullOrEmpty(contact.Name) || String.IsNullOrEmpty(contact.Surname) || String.IsNullOrEmpty(contact.EmailAddress))
+            {
+                return BadRequest(new ResponseModel() { Success = false, Message = "Insufficient Data supplied" });
+            }
+
+            var result = await _contactsRepository.UpdateContact(contact);
+            return Ok(new ResponseModel<bool>(result));
         }
 
         [HttpGet("GetUnlinkedClientsByContactId/{contactId}")]

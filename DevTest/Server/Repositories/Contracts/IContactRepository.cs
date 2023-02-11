@@ -11,6 +11,7 @@ namespace DevTest.Server.Repositories.Contracts
         Task<List<ContactDto>> GetAllContactsWithClientCount();
         Task<List<ClientDto>> GetUnlinkedClientsByContactId(int contactId);
         Task<int> SaveContact(Contact contact);
+        Task<bool> UpdateContact(Contact contact);
 
     }
 }
